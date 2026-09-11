@@ -94,16 +94,16 @@ export default function Home() {
 
   return (
 <main className="relative flex min-h-screen items-center justify-center overflow-hidden bg-[#080B09] px-4 py-8 text-white sm:px-6">  <div className="mx-auto max-w-2xl">
-        <div
-          className="pointer-events-none absolute inset-0 flex items-center justify-center"
-          aria-hidden="true"
-        >
-          <img
-            src="/logo-600.png"
-            alt=""
-            className="h-[750px] w-[750px] max-w-none object-contain opacity-[0.08]"
-          />
-        </div>
+       <div
+  className="pointer-events-none fixed inset-0 z-0 flex items-center justify-center"
+  aria-hidden="true"
+>
+  <img
+    src="/logo-600.png"
+    alt=""
+    className="h-[750px] w-[750px] max-w-none object-contain opacity-[0.08]"
+  />
+</div>
         <header className="mb-8 text-center">
           <h1 className="text-4xl font-bold tracking-tight sm:text-5xl">
             OKK Tankki sakkokassa

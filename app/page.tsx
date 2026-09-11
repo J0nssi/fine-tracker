@@ -26,6 +26,7 @@ export default function Home() {
   const [fines, setFines] = useState<Fine[]>([]);
   const [showAll, setShowAll] = useState(false);
   const [expandedPlayer, setExpandedPlayer] = useState<string | null>(null);
+  const [searchQuery, setSearchQuery] = useState("");
 
   useEffect(() => {
     const unsubscribePlayers = onSnapshot(
@@ -82,7 +83,15 @@ export default function Home() {
     (a, b) => getPlayerTotal(b.id) - getPlayerTotal(a.id)
   );
 
-  const visiblePlayers = showAll
+const filteredPlayers = sortedPlayers.filter((player) =>
+  player.name
+    .toLocaleLowerCase("fi")
+    .includes(searchQuery.toLocaleLowerCase("fi"))
+);
+
+const visiblePlayers = searchQuery.trim()
+  ? filteredPlayers.slice(0, 5)
+  : showAll
     ? sortedPlayers
     : sortedPlayers.slice(0, 5);
 
@@ -193,114 +202,141 @@ export default function Home() {
 </section>
 
         <section>
-          <div className="mb-4 flex items-center justify-between">
+          <div className="mb-4 flex items-center justify-between gap-3">
             <h2 className="text-xl font-bold">
               Pelaajat
             </h2>
 
-            <span className="text-sm text-gray-500">
-              {players.length} pelaajaa
-            </span>
-          </div>
+            <div className="relative w-40 sm:w-48">
+              <input
+                type="text"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                placeholder="Hae pelaajaa..."
+                className="w-full rounded-lg border border-[#1C2A21] bg-[#101712] px-3 py-2 pr-8 text-xs text-white outline-none transition placeholder:text-gray-600 focus:border-[#00843D]"
+              />
 
-          <div className="space-y-3">
-            {visiblePlayers.map((player, index) => {
-              const playerFines = getPlayerFines(player.id);
-              const playerTotal = getPlayerTotal(player.id);
-              const isExpanded = expandedPlayer === player.id;
-
-              return (
-                <div
-                  key={player.id}
-                  className="overflow-hidden rounded-2xl border border-[#1C2A21] bg-[#101712] transition-colors hover:border-[#00843D]"
+              {searchQuery && (
+                <button
+                  type="button"
+                  onClick={() => setSearchQuery("")}
+                  className="absolute right-2 top-1/2 -translate-y-1/2 cursor-pointer text-gray-500 hover:text-white"
+                  aria-label="Tyhjennä haku"
                 >
-                  <button
-                    type="button"
-                    onClick={() => togglePlayer(player.id)}
-                    className="flex w-full cursor-pointer items-center justify-between px-5 py-4 text-left"
-                  >
-                    <div className="flex items-center gap-4">
-                      <span className="flex h-8 w-8 items-center justify-center rounded-full bg-black text-sm font-bold text-gray-400">
-                        {index + 1}
-                      </span>
-
-                      <div>
-                        <p className="font-semibold">
-                          {player.name}
-                        </p>
-
-                        <p className="text-xs text-gray-500">
-                          {playerFines.length}{" "}
-                          {playerFines.length === 1
-                            ? "sakko"
-                            : "sakkoa"}
-                        </p>
-                      </div>
-                    </div>
-
-                    <div className="flex items-center gap-3">
-                      <span
-                        className={`text-lg font-bold ${
-                          playerTotal > 0
-                            ? "text-[#F5A400]"
-                            : "text-gray-500"
-                        }`}
-                      >
-                        {playerTotal} €
-                      </span>
-
-                      <span
-                        className={`text-gray-500 transition-transform ${
-                          isExpanded ? "rotate-180" : ""
-                        }`}
-                      >
-                        ▼
-                      </span>
-                    </div>
-                  </button>
-
-                  {isExpanded && (
-  <div className="border-t border-[#1C2A21] bg-black/30 px-4 py-2">
-    {playerFines.length === 0 ? (
-      <p className="py-1 text-xs text-gray-500">
-        Ei sakkoja.
-      </p>
-    ) : (
-      <div className="divide-y divide-[#1C2A21]">
-        {playerFines.map((fine, fineIndex) => (
-          <div
-            key={fineIndex}
-            className="flex justify-between py-2 text-xs"
-          >
-            <div>
-              <p className="text-gray-300">
-                {fine.reason}
-              </p>
-
-              {fine.createdAt && (
-                <p className="mt-0.5 text-[10px] text-gray-500">
-                  {fine.createdAt
-                    .toDate()
-                    .toLocaleDateString("fi-FI")}
-                </p>
+                  ×
+                </button>
               )}
             </div>
-
-            <span className="font-semibold text-[#F5A400]">
-              {fine.amount} €
-            </span>
-          </div>
-        ))}
-      </div>
-    )}
-  </div>
-)}
-                </div>
-              );
-            })}
           </div>
 
-          {players.length > 5 && (
+          <div className="min-h-[360px]">
+            {visiblePlayers.length === 0 ? (
+              <div className="flex min-h-[360px] items-center justify-center rounded-2xl border border-[#1C2A21] bg-[#101712]">
+                <p className="text-sm text-gray-500">
+                  Ei pelaajaa haulla "{searchQuery}"
+                </p>
+              </div>
+            ) : (
+              <div className="space-y-3">
+                {visiblePlayers.map((player, index) => {
+                  const playerFines = getPlayerFines(player.id);
+                  const playerTotal = getPlayerTotal(player.id);
+                  const isExpanded = expandedPlayer === player.id;
+
+                  return (
+                    <div
+                      key={player.id}
+                      className="overflow-hidden rounded-2xl border border-[#1C2A21] bg-[#101712] transition-colors hover:border-[#00843D]"
+                    >
+                      <button
+                        type="button"
+                        onClick={() => togglePlayer(player.id)}
+                        className="flex w-full cursor-pointer items-center justify-between px-5 py-4 text-left"
+                      >
+                        <div className="flex items-center gap-4">
+                          <span className="flex h-8 w-8 items-center justify-center rounded-full bg-black text-sm font-bold text-gray-400">
+                            {index + 1}
+                          </span>
+
+                          <div>
+                            <p className="font-semibold">
+                              {player.name}
+                            </p>
+
+                            <p className="text-xs text-gray-500">
+                              {playerFines.length}{" "}
+                              {playerFines.length === 1
+                                ? "sakko"
+                                : "sakkoa"}
+                            </p>
+                          </div>
+                        </div>
+
+                        <div className="flex items-center gap-3">
+                          <span
+                            className={`text-lg font-bold ${
+                              playerTotal > 0
+                                ? "text-[#F5A400]"
+                                : "text-gray-500"
+                            }`}
+                          >
+                            {playerTotal} €
+                          </span>
+
+                          <span
+                            className={`text-gray-500 transition-transform ${
+                              isExpanded ? "rotate-180" : ""
+                            }`}
+                          >
+                            ▼
+                          </span>
+                        </div>
+                      </button>
+
+                      {isExpanded && (
+                        <div className="border-t border-[#1C2A21] bg-black/30 px-4 py-2">
+                          {playerFines.length === 0 ? (
+                            <p className="py-1 text-xs text-gray-500">
+                              Ei sakkoja.
+                            </p>
+                          ) : (
+                            <div className="divide-y divide-[#1C2A21]">
+                              {playerFines.map((fine, fineIndex) => (
+                                <div
+                                  key={fineIndex}
+                                  className="flex justify-between py-2 text-xs"
+                                >
+                                  <div>
+                                    <p className="text-gray-300">
+                                      {fine.reason}
+                                    </p>
+
+                                    {fine.createdAt && (
+                                      <p className="mt-0.5 text-[10px] text-gray-500">
+                                        {fine.createdAt
+                                          .toDate()
+                                          .toLocaleDateString("fi-FI")}
+                                      </p>
+                                    )}
+                                  </div>
+
+                                  <span className="font-semibold text-[#F5A400]">
+                                    {fine.amount} €
+                                  </span>
+                                </div>
+                              ))}
+                            </div>
+                          )}
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+          </div>
+
+          {players.length > 5 && !searchQuery.trim() && (
             <button
               type="button"
               onClick={() => setShowAll(!showAll)}

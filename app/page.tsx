@@ -27,6 +27,7 @@ export default function Home() {
   const [showAll, setShowAll] = useState(false);
   const [expandedPlayer, setExpandedPlayer] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
+  const [showFineRules, setShowFineRules] = useState(false);
 
   useEffect(() => {
     const unsubscribePlayers = onSnapshot(
@@ -118,6 +119,15 @@ const visiblePlayers = searchQuery.trim()
             OKK Tankki sakkokassa
           </h1>
         </header>
+        <div className="-mt-5 mb-6 text-center">
+  <button
+    type="button"
+    onClick={() => setShowFineRules(true)}
+    className="cursor-pointer text-xs text-gray-500 transition hover:text-[#00843D]"
+  >
+    Mistä saan sakot?
+  </button>
+</div>
 
         <section className="mb-7 space-y-2">
 
@@ -358,6 +368,108 @@ const visiblePlayers = searchQuery.trim()
           </a>
         </div>
       </div>
+      {showFineRules && (
+  <div
+    className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 px-4 py-6 backdrop-blur-sm"
+    onClick={() => setShowFineRules(false)}
+  >
+    <div
+      className="relative max-h-[85vh] w-full max-w-lg overflow-y-auto rounded-2xl border border-[#1C2A21] bg-[#101712] p-5 shadow-2xl sm:p-6"
+      onClick={(e) => e.stopPropagation()}
+    >
+      <button
+        type="button"
+        onClick={() => setShowFineRules(false)}
+        className="absolute right-4 top-3 cursor-pointer text-xl text-gray-500 transition hover:text-white"
+        aria-label="Sulje"
+      >
+        ×
+      </button>
+
+      <h2 className="mb-5 pr-8 text-2xl font-bold">
+        Mistä saan sakot?
+      </h2>
+
+      <div className="space-y-4 text-sm">
+        <div>
+          <p className="font-semibold text-white">
+            Myöhästyminen joukkueen tapahtumasta ilman ilmoitusta
+          </p>
+          <div className="mt-1 space-y-0.5 text-gray-400">
+            <p>
+              Treenit <span className="float-right font-semibold text-[#F5A400]">5 €</span>
+            </p>
+            <p>
+              Peli <span className="float-right font-semibold text-[#F5A400]">10 €</span>
+            </p>
+          </div>
+        </div>
+
+        <div>
+          <p className="font-semibold text-white">
+            Puuttuva Jopox-ilmoittautuminen
+          </p>
+          <div className="mt-1 space-y-0.5 text-gray-400">
+            <p>
+              Treenit, alle 6 h ennen tapahtumaa
+              <span className="float-right font-semibold text-[#F5A400]">5 €</span>
+            </p>
+            <p>
+              Peli, alle 24 h ennen tapahtumaa
+              <span className="float-right font-semibold text-[#F5A400]">5 €</span>
+            </p>
+          </div>
+        </div>
+
+        <div>
+          <p className="font-semibold text-white">
+            Omien tavaroiden unohtaminen pukukoppiin
+          </p>
+          <div className="mt-1 space-y-0.5 text-gray-400">
+            <p>
+              Treenit <span className="float-right font-semibold text-[#F5A400]">5 €</span>
+            </p>
+            <p>
+              Peli <span className="float-right font-semibold text-[#F5A400]">10 €</span>
+            </p>
+          </div>
+        </div>
+
+        <div>
+          <p className="font-semibold text-white">
+            Varusteiden unohtaminen
+          </p>
+          <div className="mt-1 space-y-0.5 text-gray-400">
+            <p>
+              Treenit <span className="float-right font-semibold text-[#F5A400]">5 €</span>
+            </p>
+            <p>
+              Peli <span className="float-right font-semibold text-[#F5A400]">10 €</span>
+            </p>
+          </div>
+        </div>
+
+        <div className="flex justify-between border-t border-[#1C2A21] pt-3">
+          <p className="font-semibold text-white">
+            Käytösrangaistus
+          </p>
+          <span className="font-semibold text-[#F5A400]">
+            15 €
+          </span>
+        </div>
+
+        <div className="flex justify-between">
+          <p className="font-semibold text-white">
+            Ei sakkoja koko kauden aikana
+          </p>
+          <span className="font-semibold text-[#F5A400]">
+            10 €
+          </span>
+        </div>
+      </div>
+    </div>
+  </div>
+)}
     </main>
   );
 }

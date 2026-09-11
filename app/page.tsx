@@ -106,45 +106,91 @@ export default function Home() {
         </div>
         <header className="mb-8 text-center">
           <h1 className="text-4xl font-bold tracking-tight sm:text-5xl">
-            Sakkokassa
+            OKK Tankki sakkokassa
           </h1>
-
-          <p className="mt-2 text-sm font-medium uppercase tracking-widest text-gray-400">
-            Pasilan sauna & 3 lavaa kaljaa
-          </p>
         </header>
 
-        <section className="mb-8 rounded-2xl border border-[#1C2A21] bg-[#101712] p-6 shadow-xl">
-          <div className="mb-3 flex items-end justify-between">
-            <div>
-              <p className="text-sm font-medium uppercase tracking-wide text-gray-400">
-                Yhteensä
-              </p>
+        <section className="mb-7 space-y-2">
 
-              <p className="mt-1 text-4xl font-bold">
-                {totalFines} €
-              </p>
-            </div>
+  {/* 3 lavaa Sandelsia */}
+  <div className="rounded-xl border border-[#1C2A21] bg-[#101712] px-4 py-3 shadow-lg">
+    <div className="mb-1.5 flex items-center justify-between">
+      <div>
+        <p className="text-[11px] font-medium uppercase tracking-wide text-gray-400">
+          3 lavaa Sandelsia
+        </p>
 
-            <p className="text-lg font-semibold text-[#F5A400]">
-              / 400 €
-            </p>
-          </div>
+        <p className="mt-0.5 text-xl font-bold">
+          {Math.min(totalFines, 95)} €
+          <span className="ml-1 text-xs font-normal text-[#F5A400]">
+            / 95 €
+          </span>
+        </p>
+      </div>
 
-          <div className="h-3 overflow-hidden rounded-full bg-black">
-            <div
-              className="h-full rounded-full bg-[#00843D] transition-all duration-500"
-              style={{
-                width: `${Math.min((totalFines / 400) * 100, 100)}%`,
-              }}
-            />
-          </div>
+      {totalFines >= 95 && (
+        <span className="text-xs font-semibold text-[#16A34A]">
+          Tavoite saavutettu!
+        </span>
+      )}
+    </div>
 
-          <div className="mt-2 flex justify-between text-xs text-gray-500">
-            <span>0 €</span>
-            <span>400 €</span>
-          </div>
-        </section>
+    <div className="h-1.5 overflow-hidden rounded-full bg-black">
+      <div
+        className={`h-full rounded-full transition-all duration-500 ${
+          totalFines < 9.5
+            ? "bg-red-500"
+            : totalFines < 66.5
+              ? "bg-[#F5A400]"
+              : "bg-[#00843D]"
+        }`}
+        style={{
+          width: `${Math.min((totalFines / 95) * 100, 100)}%`,
+        }}
+      />
+    </div>
+  </div>
+
+  {/* Pasilan sauna */}
+  <div className="rounded-xl border border-[#1C2A21] bg-[#101712] px-4 py-3 shadow-lg">
+    <div className="mb-1.5 flex items-center justify-between">
+      <div>
+        <p className="text-[11px] font-medium uppercase tracking-wide text-gray-400">
+          Pasilan Allianssi-sauna
+        </p>
+
+        <p className="mt-0.5 text-xl font-bold">
+          {Math.min(totalFines, 355)} €
+          <span className="ml-1 text-xs font-normal text-[#F5A400]">
+            / 355 €
+          </span>
+        </p>
+      </div>
+
+      {totalFines >= 355 && (
+        <span className="text-xs font-semibold text-[#16A34A]">
+          Tavoite saavutettu!
+        </span>
+      )}
+    </div>
+
+    <div className="h-1.5 overflow-hidden rounded-full bg-black">
+      <div
+        className={`h-full rounded-full transition-all duration-500 ${
+          totalFines < 35.5
+            ? "bg-red-500"
+            : totalFines < 248.5
+              ? "bg-[#F5A400]"
+              : "bg-[#00843D]"
+        }`}
+        style={{
+          width: `${Math.min((totalFines / 355) * 100, 100)}%`,
+        }}
+      />
+    </div>
+  </div>
+
+</section>
 
         <section>
           <div className="mb-4 flex items-center justify-between">
@@ -214,41 +260,41 @@ export default function Home() {
                   </button>
 
                   {isExpanded && (
-                    <div className="border-t border-[#1C2A21] bg-black/30 px-5 py-3">
-                      {playerFines.length === 0 ? (
-                        <p className="py-2 text-sm text-gray-500">
-                          Ei sakkoja.
-                        </p>
-                      ) : (
-                        <div className="divide-y divide-[#1C2A21]">
-                          {playerFines.map((fine, fineIndex) => (
-                            <div
-                              key={fineIndex}
-                              className="flex justify-between py-3 text-sm"
-                            >
-                              <div>
-                                <p className="text-gray-300">
-                                  {fine.reason}
-                                </p>
+  <div className="border-t border-[#1C2A21] bg-black/30 px-4 py-2">
+    {playerFines.length === 0 ? (
+      <p className="py-1 text-xs text-gray-500">
+        Ei sakkoja.
+      </p>
+    ) : (
+      <div className="divide-y divide-[#1C2A21]">
+        {playerFines.map((fine, fineIndex) => (
+          <div
+            key={fineIndex}
+            className="flex justify-between py-2 text-xs"
+          >
+            <div>
+              <p className="text-gray-300">
+                {fine.reason}
+              </p>
 
-                                {fine.createdAt && (
-                                  <p className="mt-1 text-xs text-gray-500">
-                                    {fine.createdAt
-                                      .toDate()
-                                      .toLocaleDateString("fi-FI")}
-                                  </p>
-                                )}
-                              </div>
+              {fine.createdAt && (
+                <p className="mt-0.5 text-[10px] text-gray-500">
+                  {fine.createdAt
+                    .toDate()
+                    .toLocaleDateString("fi-FI")}
+                </p>
+              )}
+            </div>
 
-                              <span className="font-semibold text-[#F5A400]">
-                                {fine.amount} €
-                              </span>
-                            </div>
-                          ))}
-                        </div>
-                      )}
-                    </div>
-                  )}
+            <span className="font-semibold text-[#F5A400]">
+              {fine.amount} €
+            </span>
+          </div>
+        ))}
+      </div>
+    )}
+  </div>
+)}
                 </div>
               );
             })}

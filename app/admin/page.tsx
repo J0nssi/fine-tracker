@@ -12,6 +12,7 @@ import {
   collection,
   getDocs,
   addDoc,
+  updateDoc,
   serverTimestamp,
   onSnapshot,
   deleteDoc,
@@ -23,6 +24,7 @@ import { auth, db } from "@/lib/firebase";
 
 export default function AdminPage() {
   const [user, setUser] = useState<User | null>(null);
+
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
@@ -35,6 +37,10 @@ export default function AdminPage() {
   const [reason, setReason] = useState("");
   const [amount, setAmount] = useState("");
   const [fineMessage, setFineMessage] = useState("");
+
+  const [editingFineId, setEditingFineId] = useState<string | null>(
+    null
+  );
 
   const [fines, setFines] = useState<
     {
@@ -152,21 +158,65 @@ export default function AdminPage() {
     }
 
     try {
-      await addDoc(collection(db, "fines"), {
-        playerId: selectedPlayer,
-        reason: reason.trim(),
-        amount: numericAmount,
-        createdAt: serverTimestamp(),
-      });
+      if (editingFineId) {
+        await updateDoc(
+          doc(db, "fines", editingFineId),
+          {
+            playerId: selectedPlayer,
+            reason: reason.trim(),
+            amount: numericAmount,
+          }
+        );
 
+        setFineMessage("Sakon muutokset tallennettu!");
+      } else {
+        await addDoc(collection(db, "fines"), {
+          playerId: selectedPlayer,
+          reason: reason.trim(),
+          amount: numericAmount,
+          createdAt: serverTimestamp(),
+        });
+
+        setFineMessage("Sakko lisätty!");
+      }
+
+      setSelectedPlayer("");
       setReason("");
       setAmount("");
-      setFineMessage("Sakko lisätty!");
+      setEditingFineId(null);
     } catch {
       setFineMessage(
-        "Sakon lisääminen epäonnistui."
+        editingFineId
+          ? "Sakon muokkaaminen epäonnistui."
+          : "Sakon lisääminen epäonnistui."
       );
     }
+  };
+
+  const handleEditFine = (fine: {
+    id: string;
+    playerId: string;
+    reason: string;
+    amount: number;
+  }) => {
+    setEditingFineId(fine.id);
+    setSelectedPlayer(fine.playerId);
+    setReason(fine.reason);
+    setAmount(String(fine.amount));
+    setFineMessage("");
+
+    window.scrollTo({
+      top: 0,
+      behavior: "smooth",
+    });
+  };
+
+  const handleCancelEdit = () => {
+    setEditingFineId(null);
+    setSelectedPlayer("");
+    setReason("");
+    setAmount("");
+    setFineMessage("");
   };
 
   const handleDeleteFine = async (
@@ -297,7 +347,9 @@ export default function AdminPage() {
 
         <section className="mb-8 rounded-2xl border border-[#1C2A21] bg-[#101712] p-6 shadow-xl">
           <h2 className="mb-5 text-xl font-bold">
-            Lisää sakko
+            {editingFineId
+              ? "Muokkaa sakkoa"
+              : "Lisää sakko"}
           </h2>
 
           <form
@@ -365,17 +417,33 @@ export default function AdminPage() {
               />
             </div>
 
-            <button
-              type="submit"
-              className="w-full cursor-pointer rounded-xl bg-[#00843D] px-4 py-3 font-semibold text-white transition hover:bg-[#006F34]"
-            >
-              Lisää sakko
-            </button>
+            <div className="flex gap-3">
+              <button
+                type="submit"
+                className="flex-1 cursor-pointer rounded-xl bg-[#00843D] px-4 py-3 font-semibold text-white transition hover:bg-[#006F34]"
+              >
+                {editingFineId
+                  ? "Tallenna muutokset"
+                  : "Lisää sakko"}
+              </button>
+
+              {editingFineId && (
+                <button
+                  type="button"
+                  onClick={handleCancelEdit}
+                  className="cursor-pointer rounded-xl border border-[#1C2A21] px-4 py-3 font-semibold text-gray-300 transition hover:border-gray-500 hover:text-white"
+                >
+                  Peruuta
+                </button>
+              )}
+            </div>
 
             {fineMessage && (
               <p
                 className={`text-sm ${
-                  fineMessage === "Sakko lisätty!"
+                  fineMessage === "Sakko lisätty!" ||
+                  fineMessage ===
+                    "Sakon muutokset tallennettu!"
                     ? "text-[#16A34A]"
                     : "text-red-400"
                 }`}
@@ -410,9 +478,7 @@ export default function AdminPage() {
                 >
                   <div className="min-w-0">
                     <p className="font-semibold">
-                      {getPlayerName(
-                        fine.playerId
-                      )}
+                      {getPlayerName(fine.playerId)}
                     </p>
 
                     <p className="mt-1 text-sm text-gray-400">
@@ -433,15 +499,27 @@ export default function AdminPage() {
                       {fine.amount} €
                     </span>
 
-                    <button
-                      type="button"
-                      onClick={() =>
-                        handleDeleteFine(fine.id)
-                      }
-                      className="mt-1 cursor-pointer text-sm text-red-400 transition hover:text-red-300"
-                    >
-                      Poista
-                    </button>
+                    <div className="mt-2 flex items-center gap-3">
+                      <button
+                        type="button"
+                        onClick={() =>
+                          handleEditFine(fine)
+                        }
+                        className="cursor-pointer text-sm text-[#00843D] transition hover:text-[#00A84F]"
+                      >
+                        Muokkaa
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={() =>
+                          handleDeleteFine(fine.id)
+                        }
+                        className="cursor-pointer text-sm text-red-400 transition hover:text-red-300"
+                      >
+                        Poista
+                      </button>
+                    </div>
                   </div>
                 </div>
               ))}

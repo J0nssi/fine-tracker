@@ -125,8 +125,7 @@ const visiblePlayers = searchQuery.trim()
     onClick={() => setShowFineRules(true)}
     className="cursor-pointer text-xs text-gray-500 transition hover:text-[#00843D]"
   >
-    Mistä saan sakot?
-  </button>
+Joukkuesäännöt / Mistä saan sakot?  </button>
 </div>
 
         <section className="mb-7 space-y-2">
@@ -387,7 +386,7 @@ const visiblePlayers = searchQuery.trim()
       </button>
 
       <h2 className="mb-5 pr-8 text-2xl font-bold">
-        Mistä saan sakot?
+        Joukkuesäännöt / Mistä saan sakot?
       </h2>
 
       <div className="space-y-4 text-sm">
@@ -411,11 +410,11 @@ const visiblePlayers = searchQuery.trim()
           </p>
           <div className="mt-1 space-y-0.5 text-gray-400">
             <p>
-              Treenit, alle 6 h ennen tapahtumaa
+              Treenit, klo 12:00 mennessä samana päivänä
               <span className="float-right font-semibold text-[#F5A400]">5 €</span>
             </p>
             <p>
-              Peli, alle 24 h ennen tapahtumaa
+              Peli, alle 24 h ennen tapahtumaa ilman erillistä syytä
               <span className="float-right font-semibold text-[#F5A400]">5 €</span>
             </p>
           </div>
@@ -458,7 +457,15 @@ const visiblePlayers = searchQuery.trim()
           </span>
         </div>
 
-        <div className="flex justify-between">
+        <div className="flex justify-between  pt-3">
+          <p className="font-semibold text-white">
+            3 jäähyä samaan peliin
+          </p>
+          <span className="font-semibold text-[#F5A400]">
+            5 €
+          </span>
+        </div>
+        <div className="flex justify-between pt-3">
           <p className="font-semibold text-white">
             Ei sakkoja koko kauden aikana
           </p>

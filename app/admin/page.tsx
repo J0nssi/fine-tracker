@@ -36,6 +36,7 @@ export default function AdminPage() {
   const [selectedPlayer, setSelectedPlayer] = useState("");
   const [reason, setReason] = useState("");
   const [amount, setAmount] = useState("");
+  const [selectedFineType, setSelectedFineType] = useState("");
   const [fineMessage, setFineMessage] = useState("");
 
   const [editingFineId, setEditingFineId] = useState<string | null>(
@@ -51,6 +52,41 @@ export default function AdminPage() {
       createdAt?: unknown;
     }[]
   >([]);
+
+  const fineOptions = [
+    {
+      name: "Myöhässä treeneistä",
+      amount: 5,
+    },
+    {
+      name: "Myöhässä pelistä",
+      amount: 10,
+    },
+    {
+      name: "Poissa treeneistä ilmoittamatta",
+      amount: 10,
+    },
+    {
+      name: "Poissa pelistä ilmoittamatta",
+      amount: 20,
+    },
+    {
+      name: "Varusteet unohtuneet",
+      amount: 5,
+    },
+    {
+      name: "Juomapullo unohtunut",
+      amount: 5,
+    },
+    {
+      name: "Ei äänestänyt",
+      amount: 5,
+    },
+    {
+      name: "Muu",
+      amount: 0,
+    },
+  ];
 
   useEffect(() => {
     const unsubscribeAuth = onAuthStateChanged(
@@ -134,6 +170,32 @@ export default function AdminPage() {
     );
   };
 
+  const handleFineTypeChange = (
+    value: string
+  ) => {
+    setSelectedFineType(value);
+
+    if (value === "custom") {
+      setReason("");
+      setAmount("");
+      return;
+    }
+
+    const selectedOption = fineOptions.find(
+      (option) => option.name === value
+    );
+
+    if (selectedOption) {
+      setReason(selectedOption.name);
+
+      if (selectedOption.amount > 0) {
+        setAmount(String(selectedOption.amount));
+      } else {
+        setAmount("");
+      }
+    }
+  };
+
   const handleAddFine = async (
     e: React.FormEvent
   ) => {
@@ -168,7 +230,9 @@ export default function AdminPage() {
           }
         );
 
-        setFineMessage("Sakon muutokset tallennettu!");
+        setFineMessage(
+          "Sakon muutokset tallennettu!"
+        );
       } else {
         await addDoc(collection(db, "fines"), {
           playerId: selectedPlayer,
@@ -183,6 +247,7 @@ export default function AdminPage() {
       setSelectedPlayer("");
       setReason("");
       setAmount("");
+      setSelectedFineType("");
       setEditingFineId(null);
     } catch {
       setFineMessage(
@@ -203,6 +268,19 @@ export default function AdminPage() {
     setSelectedPlayer(fine.playerId);
     setReason(fine.reason);
     setAmount(String(fine.amount));
+
+    const matchingFineType = fineOptions.find(
+      (option) =>
+        option.name === fine.reason &&
+        option.amount === fine.amount
+    );
+
+    setSelectedFineType(
+      matchingFineType
+        ? matchingFineType.name
+        : "custom"
+    );
+
     setFineMessage("");
 
     window.scrollTo({
@@ -216,6 +294,7 @@ export default function AdminPage() {
     setSelectedPlayer("");
     setReason("");
     setAmount("");
+    setSelectedFineType("");
     setFineMessage("");
   };
 
@@ -380,6 +459,40 @@ export default function AdminPage() {
                     {player.name}
                   </option>
                 ))}
+              </select>
+            </div>
+
+            <div>
+              <label className="mb-2 block text-sm font-medium text-gray-300">
+                Sakkotyyppi
+              </label>
+
+              <select
+                value={selectedFineType}
+                onChange={(e) =>
+                  handleFineTypeChange(e.target.value)
+                }
+                className="w-full cursor-pointer rounded-xl border border-[#1C2A21] bg-[#080B09] px-4 py-3 text-white outline-none transition focus:border-[#00843D] focus:ring-1 focus:ring-[#00843D]"
+              >
+                <option value="">
+                  Valitse sakkotyyppi
+                </option>
+
+                {fineOptions.map((option) => (
+                  <option
+                    key={option.name}
+                    value={option.name}
+                  >
+                    {option.name}
+                    {option.amount > 0
+                      ? ` – ${option.amount} €`
+                      : ""}
+                  </option>
+                ))}
+
+                <option value="custom">
+                  Muu / oma sakko
+                </option>
               </select>
             </div>
 
